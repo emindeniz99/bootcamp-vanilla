@@ -114,7 +114,8 @@ const CreateNote = ({ createNote }) => {
       <button
         style={{ backgroundColor: "grey", color: "white", padding: "0.5rem" }}
         onClick={() => {
-          note.trim() && createNote(note) && setNote("");
+          note.trim() && createNote(note);
+          setNote("");
         }}
       >
         Create

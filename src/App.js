@@ -1,51 +1,23 @@
+import React, { useState } from "react";
+import CurrencyTable from "./components/currency/CurrencyTable";
+import NoteApp from "./components/notes/NoteApp";
 import data from "./data";
-
 const App = () => {
+  const [state, setState] = useState("notes");
+
   return (
     <div className="App">
-      <CurrencyTable currencies={data.currencies} />
+      <div style={{ margin: "1rem" }}>
+        {["notes", "currency"].map((app, index) => (
+          <button key={index} onClick={() => setState(app)}>
+            {app}
+          </button>
+        ))}
+      </div>
+      {state === "currency" && <CurrencyTable currencies={data.currencies} />}
+      {state === "notes" && <NoteApp />}
     </div>
   );
 };
 
-const CurrencyTable = ({ currencies }) => {
-  const fields = {
-    exchangeType: "Döviz Cinsi",
-    buy: "Alış(TL)",
-    sell: "Satış(TL)",
-    diff: "Fark(%)",
-  };
-  return (
-    <>
-      <Table>
-        <thead>
-          <tr>
-            {Object.values(fields).map((val, index) => (
-              <HeadCell key={index}>{val}</HeadCell>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {currencies.map((currency, index) => (
-            <tr key={index}>
-              {Object.keys(fields).map((field, index) => (
-                <DataCell key={index}>{currency[field]}</DataCell>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-    </>
-  );
-};
-
-const Table = ({ children }) => {
-  return <table style={{ border: "1px solid black" }}>{children}</table>;
-};
-const DataCell = ({ children }) => {
-  return <td style={{ border: "1px solid black" }}>{children}</td>;
-};
-const HeadCell = ({ children }) => {
-  return <th style={{ border: "1px solid black" }}>{children}</th>;
-};
 export default App;

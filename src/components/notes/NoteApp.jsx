@@ -10,18 +10,25 @@ const useNote = (initialValue = []) => {
   }, [notes]);
 
   const createNote = (newNote) => {
-    setNotes((notes) => notes.concat(newNote));
+    setNotes((notes) => [newNote].concat(notes));
   };
 
-  const deleteNoteByIndex = (deletedItemIndex) => {
-    setNotes((notes) => notes.filter((_, index) => index !== deletedItemIndex));
+  const deleteNoteByIndex = (deletedNoteIndex) => {
+    setNotes((notes) => notes.filter((_, index) => index !== deletedNoteIndex));
+  };
+  const updateNote = (updatedNote, updatedNoteIndex) => {
+    setNotes((notes) =>
+      notes.map((note, index) =>
+        index !== updatedNoteIndex ? note : updatedNote
+      )
+    );
   };
 
-  return { notes, createNote, deleteNoteByIndex };
+  return { notes, createNote, deleteNoteByIndex, updateNote };
 };
 
 const NoteApp = () => {
-  const { notes, createNote, deleteNoteByIndex } = useNote();
+  const { notes, createNote, deleteNoteByIndex, updateNote } = useNote();
   return (
     <div>
       <CreateNote createNote={createNote} />
@@ -30,6 +37,7 @@ const NoteApp = () => {
           <NoteItem
             key={index}
             deleteNote={() => deleteNoteByIndex(index)}
+            updateNote={(updatedNote) => updateNote(updatedNote, index)}
             note={note}
           />
         );
@@ -38,7 +46,9 @@ const NoteApp = () => {
   );
 };
 
-const NoteItem = ({ deleteNote, note }) => {
+const NoteItem = ({ deleteNote, updateNote, note }) => {
+  const [editMode, setEditMode] = useState(false);
+  const [state, setstate] = useState(note);
   return (
     <div
       style={{
@@ -48,7 +58,39 @@ const NoteItem = ({ deleteNote, note }) => {
       }}
     >
       <button onClick={deleteNote}>delete</button>
-      <div>{note}</div>
+      <button
+        onClick={() => {
+          setEditMode(!editMode);
+        }}
+      >
+        {editMode ? "discard changes" : "edit"}
+      </button>
+      {editMode && (
+        <button
+          onClick={() => {
+            updateNote(state);
+            setEditMode(false);
+          }}
+        >
+          save
+        </button>
+      )}
+      <div
+        style={{
+          margin: "1rem",
+        }}
+      >
+        {editMode ? (
+          <textarea
+            style={{ width: "100%" }}
+            type="text"
+            value={state}
+            onChange={(e) => setstate(e.target.value)}
+          />
+        ) : (
+          note
+        )}
+      </div>
     </div>
   );
 };
@@ -72,7 +114,7 @@ const CreateNote = ({ createNote }) => {
       <button
         style={{ backgroundColor: "grey", color: "white", padding: "0.5rem" }}
         onClick={() => {
-          note.trim() && createNote(note);
+          note.trim() && createNote(note) && setNote("");
         }}
       >
         Create

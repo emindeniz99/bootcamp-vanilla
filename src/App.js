@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import CurrencyTable from "./components/currency/CurrencyTable";
-import NoteApp from "./components/notes/NoteApp";
+import NoteApp from "./components/notes/Router";
 import data from "./data";
 const App = () => {
   const [state, setState] = useState("notes");

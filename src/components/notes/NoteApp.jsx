@@ -1,4 +1,11 @@
 import React, { useEffect, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useParams,
+} from "react-router-dom";
 
 const useNote = (initialValue = []) => {
   const [notes, setNotes] = useState(
@@ -27,8 +34,7 @@ const useNote = (initialValue = []) => {
   return { notes, createNote, deleteNoteByIndex, updateNote };
 };
 
-const NoteApp = () => {
-  const { notes, createNote, deleteNoteByIndex, updateNote } = useNote();
+const NoteApp = ({ notes, createNote, deleteNoteByIndex, updateNote }) => {
   return (
     <div>
       <CreateNote createNote={createNote} />
@@ -39,6 +45,7 @@ const NoteApp = () => {
             deleteNote={() => deleteNoteByIndex(index)}
             updateNote={(updatedNote) => updateNote(updatedNote, index)}
             note={note}
+            index={index}
           />
         );
       })}
@@ -46,7 +53,7 @@ const NoteApp = () => {
   );
 };
 
-const NoteItem = ({ deleteNote, updateNote, note }) => {
+const NoteItem = ({ deleteNote, updateNote, note, index }) => {
   const [editMode, setEditMode] = useState(false);
   const [state, setstate] = useState(note);
   return (
@@ -75,6 +82,12 @@ const NoteItem = ({ deleteNote, updateNote, note }) => {
           save
         </button>
       )}
+      {index !== undefined && (
+        <Link to={`/notes/${index}`}>
+          <button>open</button>
+        </Link>
+      )}
+
       <div
         style={{
           margin: "1rem",
@@ -124,4 +137,36 @@ const CreateNote = ({ createNote }) => {
   );
 };
 
-export default NoteApp;
+const OneNotePage = ({ notes, deleteNoteByIndex, updateNote }) => {
+  let { index } = useParams();
+  index = Number(index);
+  console.log(index, notes, deleteNoteByIndex, updateNote);
+  return (
+    <NoteItem
+      key={index}
+      deleteNote={() => deleteNoteByIndex(index)}
+      updateNote={(updatedNote) => updateNote(updatedNote, index)}
+      note={notes[index]}
+    />
+  );
+};
+
+const NoteAppRouter = () => {
+  const { notes, createNote, deleteNoteByIndex, updateNote } = useNote();
+
+  return (
+    <Router>
+      <Switch>
+        <Route exact path="/notes/:index">
+          <Link to="/">go back</Link>
+          <OneNotePage {...{ notes, deleteNoteByIndex, updateNote }} />
+        </Route>
+        <Route path="/">
+          <NoteApp {...{ notes, createNote, deleteNoteByIndex, updateNote }} />
+        </Route>
+      </Switch>
+    </Router>
+  );
+};
+
+export default NoteAppRouter;
